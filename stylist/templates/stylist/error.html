@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}
+Error
+{% endblock %}
+
+{% block content %}
+
+<div class="card">
+
+    <h1>Something went wrong</h1>
+
+    <br>
+
+    <p>
+
+        {{ error }}
+
+    </p>
+
+    <br>
+
+    <a href="{% url 'stylist:upload' %}">
+
+        <button>
+
+            Try Again
+
+        </button>
+
+    </a>
+
+</div>
+
+{% endblock %}

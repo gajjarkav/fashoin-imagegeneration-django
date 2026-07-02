@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}
+AI Fashion Stylist
+{% endblock %}
+
+{% block content %}
+
+<div class="card">
+
+    <h1>AI Fashion Stylist</h1>
+
+    <p>
+        Upload a clothing item and let AI generate stylish outfit
+        recommendations.
+    </p>
+
+    <br>
+
+    <a href="{% url 'stylist:upload' %}">
+        <button>
+            Get Started
+        </button>
+    </a>
+
+</div>
+
+{% endblock %}

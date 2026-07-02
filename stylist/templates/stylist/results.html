@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+
+{% block title %}
+Results
+{% endblock %}
+
+{% block content %}
+
+<div class="card">
+
+    <h1>AI Fashion Stylist</h1>
+
+    <hr>
+
+    <h2>Uploaded Clothing</h2>
+
+    <br>
+
+    <img
+        src="{{ upload.original_image.url }}"
+        width="320"
+    >
+
+    <br><br>
+
+    <h2>Analysis</h2>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>Category</th>
+            <td>{{ analysis.category }}</td>
+        </tr>
+
+        <tr>
+            <th>Primary Color</th>
+            <td>{{ analysis.dominant_color }}</td>
+        </tr>
+
+        <tr>
+            <th>Subcategory</th>
+            <td>{{ analysis.analysis_json.subcategory }}</td>
+        </tr>
+
+        <tr>
+            <th>Pattern</th>
+            <td>{{ analysis.analysis_json.pattern }}</td>
+        </tr>
+
+        <tr>
+            <th>Fit</th>
+            <td>{{ analysis.analysis_json.fit }}</td>
+        </tr>
+
+        <tr>
+            <th>Material</th>
+            <td>{{ analysis.analysis_json.material }}</td>
+        </tr>
+
+        <tr>
+            <th>Style</th>
+            <td>{{ analysis.analysis_json.style }}</td>
+        </tr>
+
+        <tr>
+            <th>Gender</th>
+            <td>{{ analysis.analysis_json.gender }}</td>
+        </tr>
+
+    </table>
+
+    <br>
+
+    <hr>
+
+    <h2>Generated Outfit Plans</h2>
+
+    <br>
+
+    {% for outfit in style_session.recommendation_json.outfits %}
+
+        <div
+            style="
+            border:1px solid #ddd;
+            padding:20px;
+            margin-bottom:25px;
+            border-radius:10px;
+            "
+        >
+
+            <h3>
+
+                {{ outfit.theme }}
+
+            </h3>
+
+            <p>
+
+                <b>Bottom</b>
+
+                {{ outfit.bottom }}
+
+            </p>
+
+            <p>
+
+                <b>Footwear</b>
+
+                {{ outfit.footwear }}
+
+            </p>
+
+            <p>
+
+                <b>Bag</b>
+
+                {{ outfit.bag }}
+
+            </p>
+
+            <p>
+
+                <b>Accessories</b>
+
+            </p>
+
+            <ul>
+
+                {% for accessory in outfit.accessories %}
+
+                    <li>
+
+                        {{ accessory }}
+
+                    </li>
+
+                {% endfor %}
+
+            </ul>
+
+            <p>
+
+                <b>Jewelry</b>
+
+            </p>
+
+            <ul>
+
+                {% for item in outfit.jewelry %}
+
+                    <li>
+
+                        {{ item }}
+
+                    </li>
+
+                {% endfor %}
+
+            </ul>
+
+            <p>
+
+                <b>Reason</b>
+
+            </p>
+
+            <p>
+
+                {{ outfit.reason }}
+
+            </p>
+
+            <br><br>
+
+            <form
+                method="POST"
+                action="{% url 'stylist:generate_image' upload.uuid %}"
+            >
+
+                {% csrf_token %}
+
+                <input
+                    type="hidden"
+                    name="outfit_index"
+                    value="{{ forloop.counter0 }}"
+                >
+
+                <button>
+
+                    Generate AI Image
+
+                </button>
+
+            </form>
+
+        </div>
+
+    {% endfor %}
+
+    <hr>
+
+<h2>Generated Images</h2>
+
+<br>
+
+{% if generated_images %}
+
+<div
+    style="
+    display:flex;
+    flex-wrap:wrap;
+    gap:25px;
+    "
+>
+
+{% for image in generated_images %}
+
+<div>
+
+<img
+src="{{ image.generated_image.url }}"
+width="280"
+>
+
+<br><br>
+
+<b>
+Generated Image {{ image.option_number }}
+</b>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+{% else %}
+
+<p>
+
+No generated images yet.
+
+Click any
+
+<b>Generate AI Image</b>
+
+button above.
+
+</p>
+
+{% endif %}
+
+{% endblock %}

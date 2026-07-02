@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}
+AI Fashion Chat
+{% endblock %}
+
+{% block content %}
+
+<div class="card">
+
+    <h1>Refine Your Outfit</h1>
+
+    <br>
+
+    <img
+        src="{{ upload.original_image.url }}"
+        width="300"
+    >
+
+    <br><br>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        <textarea
+            name="message"
+            rows="5"
+            style="
+            width:100%;
+            padding:15px;
+            "
+            placeholder="Example:
+Make outfit 2 more formal.
+Replace sneakers with loafers.
+Add a black leather jacket."
+        ></textarea>
+
+        <br><br>
+
+        <button>
+
+            Generate New Outfit
+
+        </button>
+
+    </form>
+
+    <br>
+
+    {% if generated_images %}
+
+        <hr>
+
+        <h2>Generated Images</h2>
+
+        <br>
+
+        {% for image in generated_images %}
+
+            <img
+                src="{{ image.generated_image.url }}"
+                width="250"
+                style="
+                margin:15px;
+                "
+            >
+
+        {% endfor %}
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

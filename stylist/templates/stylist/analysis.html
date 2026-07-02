@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}
+Analysis
+{% endblock %}
+
+{% block content %}
+
+<div class="card">
+
+    <h1>AI Clothing Analysis</h1>
+
+    <br>
+
+    <img
+        src="{{ upload.original_image.url }}"
+        width="300"
+    >
+
+    <br><br>
+
+    <table border="1" cellpadding="10">
+
+        <tr>
+            <th>Category</th>
+            <td>{{ analysis.category }}</td>
+        </tr>
+
+        <tr>
+            <th>Primary Color</th>
+            <td>{{ analysis.dominant_color }}</td>
+        </tr>
+
+        <tr>
+            <th>Subcategory</th>
+            <td>{{ analysis.analysis_json.subcategory }}</td>
+        </tr>
+
+        <tr>
+            <th>Pattern</th>
+            <td>{{ analysis.analysis_json.pattern }}</td>
+        </tr>
+
+        <tr>
+            <th>Fit</th>
+            <td>{{ analysis.analysis_json.fit }}</td>
+        </tr>
+
+        <tr>
+            <th>Neckline</th>
+            <td>{{ analysis.analysis_json.neckline }}</td>
+        </tr>
+
+        <tr>
+            <th>Sleeve</th>
+            <td>{{ analysis.analysis_json.sleeve_length }}</td>
+        </tr>
+
+        <tr>
+            <th>Material</th>
+            <td>{{ analysis.analysis_json.material }}</td>
+        </tr>
+
+        <tr>
+            <th>Style</th>
+            <td>{{ analysis.analysis_json.style }}</td>
+        </tr>
+
+        <tr>
+            <th>Gender</th>
+            <td>{{ analysis.analysis_json.gender }}</td>
+        </tr>
+
+        <tr>
+            <th>Confidence</th>
+            <td>{{ analysis.analysis_json.confidence }}</td>
+        </tr>
+
+        <tr>
+            <th>Season</th>
+            <td>
+
+                {% for season in analysis.analysis_json.season %}
+
+                    {{ season }}
+
+                    {% if not forloop.last %}
+                        ,
+                    {% endif %}
+
+                {% endfor %}
+
+            </td>
+        </tr>
+
+    </table>
+
+</div>
+
+{% endblock %}
