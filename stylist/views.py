@@ -98,16 +98,15 @@ def analysis(request, uuid):
         )
 
     except Exception as exc:
-        raise
-        # return render(
-        #     request,
-        #     "stylist/error.html",
-        #     {
-        #         "error": str(exc),
-        #         "upload": upload
-        #     },
-        #     status=500
-        # )
+        return render(
+            request,
+            "stylist/error.html",
+            {
+                "error": str(exc),
+                "upload": upload
+            },
+            status=500
+        )
 
 
 def chat(request, uuid):

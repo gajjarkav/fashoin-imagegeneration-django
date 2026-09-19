@@ -4,6 +4,7 @@ from django.conf import settings
 
 from .base_image import BaseImageProvider
 from .exceptions import ImageGenerationError
+from .prompts_image import build_outfit_edit_prompt
 
 
 class ReplicateImageService(BaseImageProvider):
@@ -22,53 +23,7 @@ class ReplicateImageService(BaseImageProvider):
         styling_plan: dict,
     ):
 
-        prompt = f"""
-You are a professional celebrity fashion stylist.
-
-Edit the uploaded image.
-
-IMPORTANT
-
-Keep the uploaded upper clothing EXACTLY the same.
-
-Do NOT modify:
-
-- shirt
-- t-shirt
-- hoodie
-- jacket
-- logo
-- graphics
-- print
-- color
-- texture
-- fabric
-- sleeves
-- fit
-- neckline
-
-Only complete the remaining outfit.
-
-Bottom:
-{styling_plan.get("bottom", "")}
-
-Footwear:
-{styling_plan.get("footwear", "")}
-
-Accessories:
-{", ".join(styling_plan.get("accessories", []))}
-
-Bag:
-{styling_plan.get("bag", "")}
-
-Jewelry:
-{", ".join(styling_plan.get("jewelry", []))}
-
-Reason:
-{styling_plan.get("reason", "")}
-
-Create a realistic professional full-body fashion photograph.
-"""
+        prompt = build_outfit_edit_prompt(styling_plan)
 
         output = self.client.run(
             self.MODEL,
