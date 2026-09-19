@@ -1,0 +1,68 @@
+Traceback (most recent call last):
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/gemini.py", line 207, in generate_outfit_images
+    response = self.client.models.generate_images(
+        model='imagen-3.0-generate-001',
+    ...<5 lines>...
+        )
+    )
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/google/genai/models.py", line 6806, in generate_images
+    api_response = self._generate_images(
+        model=model,
+        prompt=prompt,
+        config=config,
+    )
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/google/genai/models.py", line 5631, in _generate_images
+    response = self._api_client.request(
+        'post', path, request_dict, http_options
+    )
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/google/genai/_api_client.py", line 1290, in request
+    response = self._request(http_request, http_options, stream=False)
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/google/genai/_api_client.py", line 1126, in _request
+    return self._retry(self._request_once, http_request, stream)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/tenacity/__init__.py", line 470, in __call__
+    do = self.iter(retry_state=retry_state)
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/tenacity/__init__.py", line 371, in iter
+    result = action(retry_state)
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/tenacity/__init__.py", line 413, in exc_check
+    raise retry_exc.reraise()
+          ~~~~~~~~~~~~~~~~~^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/tenacity/__init__.py", line 184, in reraise
+    raise self.last_attempt.result()
+          ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/concurrent/futures/_base.py", line 447, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/concurrent/futures/_base.py", line 396, in __get_result
+    raise self._exception
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/tenacity/__init__.py", line 473, in __call__
+    result = fn(*args, **kwargs)
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/google/genai/_api_client.py", line 1103, in _request_once
+    errors.APIError.raise_for_response(response)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/google/genai/errors.py", line 108, in raise_for_response
+    raise ClientError(status_code, response_json, response)
+google.genai.errors.ClientError: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/imagen-3.0-generate-001 is not found for API version v1beta, or is not supported for predict. Call ModelService.ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/views.py", line 254, in generate_image
+    response = workflow.image_router.generate_image(
+        public_url,
+        outfits[outfit_index],
+    )
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/image_router.py", line 37, in generate_image
+    return self.provider.generate_outfit_images(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        image_path,
+        ^^^^^^^^^^^
+        styling_plan,
+        ^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/gemini.py", line 227, in generate_outfit_images
+    raise ImageGenerationError(
+        str(exc),
+    ) from exc
+stylist.services.exceptions.ImageGenerationError: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/imagen-3.0-generate-001 is not found for API version v1beta, or is not supported for predict. Call ModelService.ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}

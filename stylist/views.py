@@ -159,7 +159,7 @@ def chat(request, uuid):
             GeneratedImageService.save(
                 style_session=style_session,
                 option_number=option,
-                image_bytes=image_bytes,
+                image_bytes=response,
                 prompt=user_prompt,
             )
 
@@ -279,7 +279,10 @@ def generate_image(request, uuid):
         )
 
     except Exception as exc:
-
+        import traceback
+        with open('debug_error.txt', 'w') as f:
+            traceback.print_exc(file=f)
+        traceback.print_exc()
         return render(
             request,
             "stylist/error.html",

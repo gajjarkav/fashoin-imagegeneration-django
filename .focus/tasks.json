@@ -1,0 +1,130 @@
+{
+  "version": 1,
+  "projects": [
+    {
+      "id": "payments-service",
+      "name": "payments-service",
+      "color": "#4a9eff",
+      "workMin": 25,
+      "breakMin": 5,
+      "cycles": 4
+    },
+    {
+      "id": "auth-revamp",
+      "name": "auth-revamp",
+      "color": "#e7a23c",
+      "workMin": 25,
+      "breakMin": 5,
+      "cycles": 4
+    },
+    {
+      "id": "docs-and-rfcs",
+      "name": "docs-and-rfcs",
+      "color": "#4ade80",
+      "workMin": 25,
+      "breakMin": 5,
+      "cycles": 4
+    }
+  ],
+  "tasks": [
+    {
+      "id": "t-1",
+      "title": "Fix webhook retries",
+      "project": "payments-service",
+      "status": "in-progress",
+      "estimateMin": 60,
+      "createdAt": "2026-09-19T18:23:10.498Z",
+      "sessions": [
+        {
+          "startedAt": "2026-09-19T17:23:10.498Z",
+          "endedAt": "2026-09-19T18:23:10.498Z",
+          "note": "Found the bug — retry queue drops 429s. Fix in progress.",
+          "branch": "fix/webhook-retries",
+          "commits": [
+            "a41f2c9"
+          ],
+          "files": [
+            "src/retry-queue.ts"
+          ],
+          "context": {
+            "openFiles": [
+              {
+                "file": "src/retry-queue.ts",
+                "line": 142
+              }
+            ],
+            "cursor": "retry-queue.ts:142"
+          }
+        }
+      ]
+    },
+    {
+      "id": "t-2",
+      "title": "Add idempotency keys",
+      "project": "payments-service",
+      "status": "open",
+      "estimateMin": 120,
+      "createdAt": "2026-09-19T18:23:10.498Z",
+      "sessions": []
+    },
+    {
+      "id": "t-3",
+      "title": "Refund edge cases",
+      "project": "payments-service",
+      "status": "open",
+      "estimateMin": 45,
+      "createdAt": "2026-09-19T18:23:10.498Z",
+      "sessions": []
+    },
+    {
+      "id": "t-4",
+      "title": "Session token rotation",
+      "project": "auth-revamp",
+      "status": "open",
+      "estimateMin": 90,
+      "createdAt": "2026-09-19T18:23:10.498Z",
+      "sessions": [
+        {
+          "startedAt": "2026-09-19T16:23:10.498Z",
+          "endedAt": "2026-09-19T16:53:10.498Z",
+          "note": "Rotation works locally; needs a test for refresh race.",
+          "branch": "auth/session-token"
+        }
+      ]
+    },
+    {
+      "id": "t-5",
+      "title": "OAuth scopes cleanup",
+      "project": "auth-revamp",
+      "status": "open",
+      "estimateMin": 60,
+      "createdAt": "2026-09-19T18:23:10.498Z",
+      "sessions": []
+    },
+    {
+      "id": "t-6",
+      "title": "RFC: rate limiting v2",
+      "project": "docs-and-rfcs",
+      "status": "open",
+      "estimateMin": 45,
+      "createdAt": "2026-09-19T18:23:10.498Z",
+      "sessions": [
+        {
+          "startedAt": "2026-09-19T15:23:10.498Z",
+          "endedAt": "2026-09-19T15:53:10.498Z",
+          "note": "Drafted the sliding-window section.",
+          "branch": "docs/rate-limiting"
+        }
+      ]
+    },
+    {
+      "id": "t-7",
+      "title": "Update onboarding guide",
+      "project": "docs-and-rfcs",
+      "status": "open",
+      "estimateMin": 30,
+      "createdAt": "2026-09-19T18:23:10.498Z",
+      "sessions": []
+    }
+  ]
+}

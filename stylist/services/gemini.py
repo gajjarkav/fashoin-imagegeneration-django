@@ -75,10 +75,20 @@ class GeminiService(BaseImageProvider):
 
     @staticmethod
     def _image_part(image_path: str):
+        import requests
 
-        path = Path(image_path)
-
-        suffix = path.suffix.lower()
+        if image_path.startswith("http://") or image_path.startswith("https://"):
+            response = requests.get(image_path)
+            response.raise_for_status()
+            data = response.content
+            # Try to guess mime type from URL or default to image/jpeg
+            suffix = Path(image_path).suffix.lower()
+            if not suffix:
+                suffix = ".jpg"
+        else:
+            path = Path(image_path)
+            suffix = path.suffix.lower()
+            data = path.read_bytes()
 
         mime_map = {
             ".jpg": "image/jpeg",
@@ -93,7 +103,7 @@ class GeminiService(BaseImageProvider):
             )
 
         return types.Part.from_bytes(
-            data=path.read_bytes(),
+            data=data,
             mime_type=mime_map[suffix],
         )
 
@@ -193,15 +203,18 @@ Styling Plan
 
         try:
 
-            response = self.client.models.generate_content(
-                model=self.MODEL_IMAGE,
-                contents=[
-                    prompt,
-                    self._image_part(image_path),
-                ],
+            # Gemini image generation uses generate_images
+            response = self.client.models.generate_images(
+                model='imagen-3.0-generate-001',
+                prompt=prompt,
+                config=types.GenerateImagesConfig(
+                    number_of_images=1,
+                    output_mime_type="image/jpeg",
+                    aspect_ratio="3:4"
+                )
             )
 
-            return response
+            return response.generated_images[0].image.image_bytes
 
         except ServerError as exc:
 
@@ -242,15 +255,17 @@ User Request
 
         try:
 
-            response = self.client.models.generate_content(
-                model=self.MODEL_IMAGE,
-                contents=[
-                    prompt,
-                    self._image_part(image_path),
-                ],
+            response = self.client.models.generate_images(
+                model='imagen-3.0-generate-001',
+                prompt=prompt,
+                config=types.GenerateImagesConfig(
+                    number_of_images=1,
+                    output_mime_type="image/jpeg",
+                    aspect_ratio="3:4"
+                )
             )
 
-            return response
+            return response.generated_images[0].image.image_bytes
 
         except ServerError as exc:
 

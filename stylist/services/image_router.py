@@ -3,7 +3,8 @@ from django.conf import settings
 from .cloudflare import CloudflareImageService
 from .gemini import GeminiService
 from .replicate import ReplicateImageService
-
+from .pixazo import PixazoImageService
+from .imagekit import ImageKitService
 
 class ImageRouter:
 
@@ -11,6 +12,8 @@ class ImageRouter:
         "gemini": GeminiService,
         "cloudflare": CloudflareImageService,
         "replicate": ReplicateImageService,
+        "pixazo": PixazoImageService,
+        "imagekit": ImageKitService,
     }
 
     def __init__(self):
