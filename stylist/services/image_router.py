@@ -1,19 +1,11 @@
 from django.conf import settings
 
-from .cloudflare import CloudflareImageService
 from .gemini import GeminiService
-from .replicate import ReplicateImageService
-from .pixazo import PixazoImageService
-from .imagekit import ImageKitService
 
 class ImageRouter:
 
     PROVIDERS = {
         "gemini": GeminiService,
-        "cloudflare": CloudflareImageService,
-        "replicate": ReplicateImageService,
-        "pixazo": PixazoImageService,
-        "imagekit": ImageKitService,
     }
 
     def __init__(self):
@@ -21,12 +13,12 @@ class ImageRouter:
         provider = getattr(
             settings,
             "IMAGE_PROVIDER",
-            "replicate",
+            "gemini",
         ).lower()
 
         provider_cls = self.PROVIDERS.get(
             provider,
-            ReplicateImageService,
+            GeminiService,
         )
 
         self.provider = provider_cls()

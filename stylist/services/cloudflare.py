@@ -5,6 +5,7 @@ from django.conf import settings
 
 from .base_image import BaseImageProvider
 from .exceptions import ImageGenerationError
+from .prompts_image import build_outfit_edit_prompt
 
 
 class CloudflareImageService(BaseImageProvider):
@@ -34,41 +35,7 @@ class CloudflareImageService(BaseImageProvider):
         styling_plan: dict,
     ):
 
-        prompt = f"""
-Create a realistic professional fashion photograph.
-
-DO NOT modify:
-- shirt
-- tshirt
-- hoodie
-- jacket
-- logo
-- print
-- graphics
-- fabric
-- color
-- texture
-
-Only complete the outfit.
-
-Bottom:
-{styling_plan.get("bottom", "")}
-
-Footwear:
-{styling_plan.get("footwear", "")}
-
-Accessories:
-{styling_plan.get("accessories", "")}
-
-Bag:
-{styling_plan.get("bag", "")}
-
-Jewelry:
-{styling_plan.get("jewelry", "")}
-
-Reason:
-{styling_plan.get("reason", "")}
-"""
+        prompt = build_outfit_edit_prompt(styling_plan)
 
         payload = {
             "model": self.MODEL,

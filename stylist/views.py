@@ -10,7 +10,6 @@ from .models import (
 )
 from .services import WorkflowService
 from .services.generated_image_service import GeneratedImageService
-from .services.imagekit import ImageKitService
 
 
 def home(request):
@@ -244,14 +243,8 @@ def generate_image(request, uuid):
     workflow = WorkflowService()
 
     try: 
-        imagekit = ImageKitService()
-
-        public_url = imagekit.upload_image(
-            upload.original_image.path,
-        )
-
         response = workflow.image_router.generate_image(
-            public_url,
+            upload.original_image.path,
             outfits[outfit_index],
         )
 
