@@ -36,6 +36,12 @@ IMAGE_PROVIDER = os.getenv("IMAGE_PROVIDER", "gemini")
 
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", None)
 
+# Azure FLUX API Configuration
+AZURE_FLUX_ENDPOINT = os.getenv("AZURE_FLUX_ENDPOINT", "")
+AZURE_FLUX_API_KEY = os.getenv("AZURE_FLUX_API_KEY", "")
+AZURE_FLUX_MODEL = os.getenv("AZURE_FLUX_MODEL", "FLUX.2-pro")
+AZURE_FLUX_API_VERSION = os.getenv("AZURE_FLUX_API_VERSION", "preview")
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -140,3 +146,20 @@ MEDIA_ROOT = BASE_DIR / "media"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "loggers": {
+        "stylist": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}

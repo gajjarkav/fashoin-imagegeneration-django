@@ -19,9 +19,11 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from stylist.api_views import edit_image_api
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("api/v1/images/edit", edit_image_api, name="api_edit_image"),
     path("", include("stylist.urls")),
 ]
 

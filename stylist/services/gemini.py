@@ -41,8 +41,8 @@ class GeminiService(BaseImageProvider):
     """
 
     TEXT_MODELS = (
-        "gemini-3-flash-preview",
         "gemini-2.5-flash",
+        "gemini-1.5-flash",
     )
 
     IMAGE_MODELS = (
@@ -152,24 +152,31 @@ class GeminiService(BaseImageProvider):
         last_error = None
 
         for model in self.TEXT_MODELS:
-            try:
-                response = self.client.models.generate_content(
-                    model=model,
-                    contents=contents,
-                )
-                return response.text or ""
+            for attempt in range(self.MAX_RETRIES):
+                try:
+                    response = self.client.models.generate_content(
+                        model=model,
+                        contents=contents,
+                    )
+                    return response.text or ""
 
-            except ClientError as exc:
-                if self._status_code(exc) in (404, 400):
-                    last_error = exc      # unknown model id -> try next
-                    continue
-                raise
+                except ClientError as exc:
+                    status = self._status_code(exc)
+                    if status in (404, 400):
+                        last_error = exc      # unknown model id -> try next model
+                        break                 # stop retrying this model
+                    if status in (429, 503):
+                        last_error = exc      # rate limit / overload -> backoff & retry
+                        time.sleep(5 * (attempt + 1))
+                        continue
+                    raise                     # other 4xx -> propagate immediately
 
-            except ServerError as exc:
-                raise GeminiUnavailableError(str(exc)) from exc
+                except ServerError as exc:
+                    last_error = exc          # server-side 503 -> backoff & retry
+                    time.sleep(5 * (attempt + 1))
 
-        raise GeminiResponseError(
-            f"No usable Gemini text model. Last error: {last_error}"
+        raise GeminiUnavailableError(
+            f"Gemini text generation failed on all models/retries. Last error: {last_error}"
         )
 
     def _edit_image(self, prompt: str, image_path: str) -> bytes:
@@ -293,15 +300,13 @@ Clothing Analysis
         except Exception as exc:
             raise ImageGenerationError(str(exc)) from exc
 
-    def refine_outfit(
+    def generate_refined_plan(
         self,
-        image_path: str,
         previous_plan: dict,
         user_prompt: str,
     ):
         """
-        Chat refinement: update the plan in text first, then edit the photo
-        with the updated plan (the old code ignored the photo completely).
+        Chat refinement: update the plan in text only.
         """
         plan_prompt = f"""
 {REFINE_OUTFIT_PROMPT}
@@ -319,11 +324,9 @@ Return ONLY valid JSON with the same schema as the previous styling plan
 jewelry, reason). No markdown, no code fences.
 """
         try:
-            updated_plan = self._parse_json(self._generate_text(plan_prompt))
-
+            return self._parse_json(self._generate_text(plan_prompt))
         except Exception:
-            # If the planner step fails, still honour the raw user request.
-            updated_plan = {
+            return {
                 "theme": previous_plan.get("theme", ""),
                 "bottom": previous_plan.get("bottom", ""),
                 "footwear": previous_plan.get("footwear", ""),
@@ -332,6 +335,17 @@ jewelry, reason). No markdown, no code fences.
                 "jewelry": previous_plan.get("jewelry", []),
                 "reason": user_prompt,
             }
+
+    def refine_outfit(
+        self,
+        image_path: str,
+        previous_plan: dict,
+        user_prompt: str,
+    ):
+        """
+        Legacy single-call refinement (text + image).
+        """
+        updated_plan = self.generate_refined_plan(previous_plan, user_prompt)
 
         edit_prompt = (
             build_outfit_edit_prompt(updated_plan)

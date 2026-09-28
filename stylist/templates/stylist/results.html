@@ -197,6 +197,39 @@ Results
 
     {% endfor %}
 
+    <!-- NEW CONTROLS FOR RANDOM AND CUSTOM PROMPTS -->
+    <div style="border:2px dashed #ccc; padding:20px; margin-bottom:25px; border-radius:10px; background-color:#f9f9f9;">
+        <h3>Want something completely different?</h3>
+        
+        <div style="display: flex; gap: 20px; align-items: flex-start; margin-top: 15px;">
+            <!-- Random Style Form -->
+            <form method="POST" action="{% url 'stylist:generate_image' upload.uuid %}" style="flex: 1;">
+                {% csrf_token %}
+                <input type="hidden" name="random_style" value="true">
+                <button type="submit" style="padding: 10px 15px; font-weight: bold; background-color: #ff4757; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    🎲 Surprise Me! (Random Style)
+                </button>
+                <p style="font-size: 0.9em; color: #555; margin-top: 5px;">Let AI invent a wildly creative outfit for you.</p>
+            </form>
+
+            <!-- Custom Prompt Form -->
+            <form method="POST" action="{% url 'stylist:generate_image' upload.uuid %}" style="flex: 2;">
+                {% csrf_token %}
+                <textarea 
+                    name="custom_prompt" 
+                    rows="3" 
+                    placeholder="E.g. Make me look like a cyberpunk hacker with a neon leather jacket..."
+                    style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; margin-bottom: 10px;"
+                    required
+                ></textarea>
+                <button type="submit" style="padding: 10px 15px; font-weight: bold; background-color: #2ed573; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    ✨ Generate Custom Style
+                </button>
+            </form>
+        </div>
+    </div>
+    <!-- END NEW CONTROLS -->
+
     <hr>
 
 <h2>Generated Images</h2>

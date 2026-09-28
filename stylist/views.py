@@ -53,9 +53,8 @@ def analysis(request, uuid):
         uuid=uuid,
     )
 
-    workflow = WorkflowService()
-
     try:
+        workflow = WorkflowService()
 
         analysis = ClothingAnalysis.objects.filter(
             upload=upload,
@@ -97,6 +96,12 @@ def analysis(request, uuid):
         )
 
     except Exception as exc:
+        import traceback
+        with open('debug_error.txt', 'a') as f:
+            f.write("\n--- ANALYSIS ERROR ---\n")
+            traceback.print_exc(file=f)
+        traceback.print_exc()
+        
         return render(
             request,
             "stylist/error.html",
@@ -231,22 +236,31 @@ def generate_image(request, uuid):
 
     style_session = (StyleSession.objects.filter(analysis=analysis).latest("created_at"))
 
-    outfit_index = int(request.POST.get("outfit_index", -1))
-
-    outfits = style_session.recommendation_json.get(
-        "outfits", []
-    )
-
-    if outfit_index < 0 or outfit_index >= len(outfits):
-        return HttpResponseBadRequest()
+    custom_prompt = request.POST.get("custom_prompt")
+    random_style = request.POST.get("random_style")
 
     workflow = WorkflowService()
 
-    try: 
-        response = workflow.image_router.generate_image(
-            upload.original_image.path,
-            outfits[outfit_index],
-        )
+    try:
+        if random_style or custom_prompt:
+            prompt_text = "Surprise me with a completely random, wildly creative, and highly fashionable outfit!" if random_style else custom_prompt
+            response = workflow.run_refinement(
+                upload,
+                style_session.recommendation_json,
+                prompt_text,
+            )
+            saved_prompt = prompt_text
+        else:
+            outfit_index = int(request.POST.get("outfit_index", -1))
+            outfits = style_session.recommendation_json.get("outfits", [])
+            if outfit_index < 0 or outfit_index >= len(outfits):
+                return HttpResponseBadRequest()
+
+            response = workflow.image_router.generate_image(
+                upload.original_image.path,
+                outfits[outfit_index],
+            )
+            saved_prompt = str(outfits[outfit_index])
 
         option_number = (
             GeneratedImage.objects.filter(
@@ -258,9 +272,7 @@ def generate_image(request, uuid):
             style_session=style_session,
             option_number=option_number,
             image_bytes=response,
-            prompt=str(
-                outfits[outfit_index],
-            ),
+            prompt=saved_prompt,
         )
 
         option_number += 1

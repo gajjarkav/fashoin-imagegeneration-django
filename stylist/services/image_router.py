@@ -1,11 +1,13 @@
 from django.conf import settings
 
 from .gemini import GeminiService
+from .flux import FluxService
 
 class ImageRouter:
 
     PROVIDERS = {
         "gemini": GeminiService,
+        "flux": FluxService,
     }
 
     def __init__(self):

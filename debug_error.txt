@@ -1,58 +1,10 @@
 Traceback (most recent call last):
-  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/gemini.py", line 207, in generate_outfit_images
-    response = self.client.models.generate_images(
-        model='imagen-3.0-generate-001',
-    ...<5 lines>...
-        )
-    )
-  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/google/genai/models.py", line 6806, in generate_images
-    api_response = self._generate_images(
-        model=model,
-        prompt=prompt,
-        config=config,
-    )
-  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/google/genai/models.py", line 5631, in _generate_images
-    response = self._api_client.request(
-        'post', path, request_dict, http_options
-    )
-  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/google/genai/_api_client.py", line 1290, in request
-    response = self._request(http_request, http_options, stream=False)
-  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/google/genai/_api_client.py", line 1126, in _request
-    return self._retry(self._request_once, http_request, stream)  # type: ignore[no-any-return]
-           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/tenacity/__init__.py", line 470, in __call__
-    do = self.iter(retry_state=retry_state)
-  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/tenacity/__init__.py", line 371, in iter
-    result = action(retry_state)
-  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/tenacity/__init__.py", line 413, in exc_check
-    raise retry_exc.reraise()
-          ~~~~~~~~~~~~~~~~~^^
-  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/tenacity/__init__.py", line 184, in reraise
-    raise self.last_attempt.result()
-          ~~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "/usr/lib/python3.14/concurrent/futures/_base.py", line 447, in result
-    return self.__get_result()
-           ~~~~~~~~~~~~~~~~~^^
-  File "/usr/lib/python3.14/concurrent/futures/_base.py", line 396, in __get_result
-    raise self._exception
-  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/tenacity/__init__.py", line 473, in __call__
-    result = fn(*args, **kwargs)
-  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/google/genai/_api_client.py", line 1103, in _request_once
-    errors.APIError.raise_for_response(response)
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
-  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/google/genai/errors.py", line 108, in raise_for_response
-    raise ClientError(status_code, response_json, response)
-google.genai.errors.ClientError: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/imagen-3.0-generate-001 is not found for API version v1beta, or is not supported for predict. Call ModelService.ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/views.py", line 254, in generate_image
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/views.py", line 251, in generate_image
     response = workflow.image_router.generate_image(
-        public_url,
+        upload.original_image.path,
         outfits[outfit_index],
     )
-  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/image_router.py", line 37, in generate_image
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/image_router.py", line 34, in generate_image
     return self.provider.generate_outfit_images(
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         image_path,
@@ -61,8 +13,667 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^
     )
     ^
-  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/gemini.py", line 227, in generate_outfit_images
-    raise ImageGenerationError(
-        str(exc),
-    ) from exc
-stylist.services.exceptions.ImageGenerationError: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/imagen-3.0-generate-001 is not found for API version v1beta, or is not supported for predict. Call ModelService.ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/flux.py", line 153, in generate_outfit_images
+    result_data = self.edit_image(f, prompt)
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/flux.py", line 74, in edit_image
+    raise FluxServiceException(f"Azure API error: {response.status_code}")
+stylist.services.flux.FluxServiceException: Azure API error: 400
+
+--- ANALYSIS ERROR ---
+Traceback (most recent call last):
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/views.py", line 66, in analysis
+    result = workflow.run_analysis(
+        upload
+    )
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/workflow.py", line 13, in run_analysis
+    return self.gemini.analyze_clothing(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        upload.original_image.path,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/gemini.py", line 236, in analyze_clothing
+    text = self._generate_text(
+        ANALYZE_CLOTHING_PROMPT,
+        parts=[ANALYZE_CLOTHING_PROMPT, self._image_part(image_path)],
+    )
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/gemini.py", line 178, in _generate_text
+    raise GeminiUnavailableError(
+        f"Gemini text generation failed on all models/retries. Last error: {last_error}"
+    )
+stylist.services.exceptions.GeminiUnavailableError: Gemini text generation failed on all models/retries. Last error: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}
+
+--- ANALYSIS ERROR ---
+Traceback (most recent call last):
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 88, in analyze_clothing
+    text = self._generate_text(messages)
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 41, in _generate_text
+    response = self.client.chat.completions.create(
+        model=self.deployment_name,
+        messages=messages,
+        response_format={"type": "json_object"}
+    )
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_utils/_utils.py", line 298, in wrapper
+    return func(*args, **kwargs)
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/resources/chat/completions/completions.py", line 1251, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<52 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_base_client.py", line 1332, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_base_client.py", line 1019, in request
+    options = self._prepare_options(options)
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_client.py", line 551, in _prepare_options
+    self._refresh_api_key()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_client.py", line 569, in _refresh_api_key
+    self.api_key = self._api_key_provider()
+                   ~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/azure/identity/_bearer_token_provider.py", line 43, in wrapper
+    policy.on_request(request)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/azure/core/pipeline/policies/_authentication.py", line 167, in on_request
+    self._request_token(*self._scopes)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/azure/core/pipeline/policies/_authentication.py", line 142, in _request_token
+    self._token = self._get_token(*scopes, **kwargs)
+                  ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/azure/core/pipeline/policies/_authentication.py", line 132, in _get_token
+    return cast(SupportsTokenInfo, self._credential).get_token_info(*scopes, options=options)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/azure/identity/_credentials/default.py", line 376, in get_token_info
+    token_info = cast(SupportsTokenInfo, super()).get_token_info(*scopes, options=options)
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/azure/identity/_credentials/chained.py", line 225, in get_token_info
+    raise ClientAuthenticationError(message=message)
+azure.core.exceptions.ClientAuthenticationError: DefaultAzureCredential failed to retrieve a token from the included credentials.
+Attempted credentials:
+	EnvironmentCredential: EnvironmentCredential authentication unavailable. Environment variables are not fully configured.
+Visit https://aka.ms/azsdk/python/identity/environmentcredential/troubleshoot to troubleshoot this issue.
+	WorkloadIdentityCredential: WorkloadIdentityCredential authentication unavailable. The workload options are not fully configured. See the troubleshooting guide for more information: https://aka.ms/azsdk/python/identity/workloadidentitycredential/troubleshoot. Missing required arguments: 'tenant_id', 'client_id', 'token_file_path'.
+	ManagedIdentityCredential: ManagedIdentityCredential authentication unavailable, no response from the IMDS endpoint.
+	SharedTokenCacheCredential: SharedTokenCacheCredential authentication unavailable. No accounts were found in the cache.
+	VisualStudioCodeCredential: VisualStudioCodeCredential requires the 'azure-identity-broker' package to be installed. You must also ensure you have the Azure Resources extension installed and have signed in to Azure via Visual Studio Code.
+	AzureCliCredential: Azure CLI not found on path
+	AzurePowerShellCredential: PowerShell is not installed
+	AzureDeveloperCliCredential: Azure Developer CLI could not be found. Please visit https://aka.ms/azure-dev for installation instructions and then,once installed, authenticate to your Azure account using 'azd auth login'.
+	BrokerCredential: InteractiveBrowserBrokerCredential unavailable. The 'azure-identity-broker' package is required to use brokered authentication.
+To mitigate this issue, please refer to the troubleshooting guidelines here at https://aka.ms/azsdk/python/identity/defaultazurecredential/troubleshoot.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/views.py", line 66, in analysis
+    result = workflow.run_analysis(
+        upload
+    )
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/workflow.py", line 14, in run_analysis
+    return self.analyzer.analyze_clothing(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        upload.original_image.path,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 91, in analyze_clothing
+    raise ClothingAnalysisError(str(exc)) from exc
+stylist.services.exceptions.ClothingAnalysisError: DefaultAzureCredential failed to retrieve a token from the included credentials.
+Attempted credentials:
+	EnvironmentCredential: EnvironmentCredential authentication unavailable. Environment variables are not fully configured.
+Visit https://aka.ms/azsdk/python/identity/environmentcredential/troubleshoot to troubleshoot this issue.
+	WorkloadIdentityCredential: WorkloadIdentityCredential authentication unavailable. The workload options are not fully configured. See the troubleshooting guide for more information: https://aka.ms/azsdk/python/identity/workloadidentitycredential/troubleshoot. Missing required arguments: 'tenant_id', 'client_id', 'token_file_path'.
+	ManagedIdentityCredential: ManagedIdentityCredential authentication unavailable, no response from the IMDS endpoint.
+	SharedTokenCacheCredential: SharedTokenCacheCredential authentication unavailable. No accounts were found in the cache.
+	VisualStudioCodeCredential: VisualStudioCodeCredential requires the 'azure-identity-broker' package to be installed. You must also ensure you have the Azure Resources extension installed and have signed in to Azure via Visual Studio Code.
+	AzureCliCredential: Azure CLI not found on path
+	AzurePowerShellCredential: PowerShell is not installed
+	AzureDeveloperCliCredential: Azure Developer CLI could not be found. Please visit https://aka.ms/azure-dev for installation instructions and then,once installed, authenticate to your Azure account using 'azd auth login'.
+	BrokerCredential: InteractiveBrowserBrokerCredential unavailable. The 'azure-identity-broker' package is required to use brokered authentication.
+To mitigate this issue, please refer to the troubleshooting guidelines here at https://aka.ms/azsdk/python/identity/defaultazurecredential/troubleshoot.
+
+--- ANALYSIS ERROR ---
+Traceback (most recent call last):
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 97, in analyze_clothing
+    text = self._generate_text(messages)
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 50, in _generate_text
+    response = self.client.chat.completions.create(
+        model=self.deployment_name,
+        messages=messages,
+        response_format={"type": "json_object"}
+    )
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_utils/_utils.py", line 298, in wrapper
+    return func(*args, **kwargs)
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/resources/chat/completions/completions.py", line 1251, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<52 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_base_client.py", line 1332, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_base_client.py", line 1019, in request
+    options = self._prepare_options(options)
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_client.py", line 551, in _prepare_options
+    self._refresh_api_key()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_client.py", line 569, in _refresh_api_key
+    self.api_key = self._api_key_provider()
+                   ~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/azure/identity/_bearer_token_provider.py", line 43, in wrapper
+    policy.on_request(request)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/azure/core/pipeline/policies/_authentication.py", line 167, in on_request
+    self._request_token(*self._scopes)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/azure/core/pipeline/policies/_authentication.py", line 142, in _request_token
+    self._token = self._get_token(*scopes, **kwargs)
+                  ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/azure/core/pipeline/policies/_authentication.py", line 132, in _get_token
+    return cast(SupportsTokenInfo, self._credential).get_token_info(*scopes, options=options)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/azure/identity/_credentials/default.py", line 376, in get_token_info
+    token_info = cast(SupportsTokenInfo, super()).get_token_info(*scopes, options=options)
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/azure/identity/_credentials/chained.py", line 225, in get_token_info
+    raise ClientAuthenticationError(message=message)
+azure.core.exceptions.ClientAuthenticationError: DefaultAzureCredential failed to retrieve a token from the included credentials.
+Attempted credentials:
+	EnvironmentCredential: EnvironmentCredential authentication unavailable. Environment variables are not fully configured.
+Visit https://aka.ms/azsdk/python/identity/environmentcredential/troubleshoot to troubleshoot this issue.
+	WorkloadIdentityCredential: WorkloadIdentityCredential authentication unavailable. The workload options are not fully configured. See the troubleshooting guide for more information: https://aka.ms/azsdk/python/identity/workloadidentitycredential/troubleshoot. Missing required arguments: 'tenant_id', 'client_id', 'token_file_path'.
+	ManagedIdentityCredential: ManagedIdentityCredential authentication unavailable, no response from the IMDS endpoint.
+	SharedTokenCacheCredential: SharedTokenCacheCredential authentication unavailable. No accounts were found in the cache.
+	VisualStudioCodeCredential: VisualStudioCodeCredential requires the 'azure-identity-broker' package to be installed. You must also ensure you have the Azure Resources extension installed and have signed in to Azure via Visual Studio Code.
+	AzureCliCredential: Azure CLI not found on path
+	AzurePowerShellCredential: PowerShell is not installed
+	AzureDeveloperCliCredential: Azure Developer CLI could not be found. Please visit https://aka.ms/azure-dev for installation instructions and then,once installed, authenticate to your Azure account using 'azd auth login'.
+	BrokerCredential: InteractiveBrowserBrokerCredential unavailable. The 'azure-identity-broker' package is required to use brokered authentication.
+To mitigate this issue, please refer to the troubleshooting guidelines here at https://aka.ms/azsdk/python/identity/defaultazurecredential/troubleshoot.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/views.py", line 66, in analysis
+    result = workflow.run_analysis(
+        upload
+    )
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/workflow.py", line 14, in run_analysis
+    return self.analyzer.analyze_clothing(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        upload.original_image.path,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 100, in analyze_clothing
+    raise ClothingAnalysisError(str(exc)) from exc
+stylist.services.exceptions.ClothingAnalysisError: DefaultAzureCredential failed to retrieve a token from the included credentials.
+Attempted credentials:
+	EnvironmentCredential: EnvironmentCredential authentication unavailable. Environment variables are not fully configured.
+Visit https://aka.ms/azsdk/python/identity/environmentcredential/troubleshoot to troubleshoot this issue.
+	WorkloadIdentityCredential: WorkloadIdentityCredential authentication unavailable. The workload options are not fully configured. See the troubleshooting guide for more information: https://aka.ms/azsdk/python/identity/workloadidentitycredential/troubleshoot. Missing required arguments: 'tenant_id', 'client_id', 'token_file_path'.
+	ManagedIdentityCredential: ManagedIdentityCredential authentication unavailable, no response from the IMDS endpoint.
+	SharedTokenCacheCredential: SharedTokenCacheCredential authentication unavailable. No accounts were found in the cache.
+	VisualStudioCodeCredential: VisualStudioCodeCredential requires the 'azure-identity-broker' package to be installed. You must also ensure you have the Azure Resources extension installed and have signed in to Azure via Visual Studio Code.
+	AzureCliCredential: Azure CLI not found on path
+	AzurePowerShellCredential: PowerShell is not installed
+	AzureDeveloperCliCredential: Azure Developer CLI could not be found. Please visit https://aka.ms/azure-dev for installation instructions and then,once installed, authenticate to your Azure account using 'azd auth login'.
+	BrokerCredential: InteractiveBrowserBrokerCredential unavailable. The 'azure-identity-broker' package is required to use brokered authentication.
+To mitigate this issue, please refer to the troubleshooting guidelines here at https://aka.ms/azsdk/python/identity/defaultazurecredential/troubleshoot.
+
+--- ANALYSIS ERROR ---
+Traceback (most recent call last):
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 97, in analyze_clothing
+    text = self._generate_text(messages)
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 50, in _generate_text
+    response = self.client.chat.completions.create(
+        model=self.deployment_name,
+        messages=messages,
+        response_format={"type": "json_object"}
+    )
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_utils/_utils.py", line 298, in wrapper
+    return func(*args, **kwargs)
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/resources/chat/completions/completions.py", line 1251, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<52 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_base_client.py", line 1332, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_base_client.py", line 1019, in request
+    options = self._prepare_options(options)
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_client.py", line 551, in _prepare_options
+    self._refresh_api_key()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_client.py", line 569, in _refresh_api_key
+    self.api_key = self._api_key_provider()
+                   ~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/azure/identity/_bearer_token_provider.py", line 43, in wrapper
+    policy.on_request(request)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/azure/core/pipeline/policies/_authentication.py", line 167, in on_request
+    self._request_token(*self._scopes)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/azure/core/pipeline/policies/_authentication.py", line 142, in _request_token
+    self._token = self._get_token(*scopes, **kwargs)
+                  ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/azure/core/pipeline/policies/_authentication.py", line 132, in _get_token
+    return cast(SupportsTokenInfo, self._credential).get_token_info(*scopes, options=options)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/azure/identity/_credentials/default.py", line 376, in get_token_info
+    token_info = cast(SupportsTokenInfo, super()).get_token_info(*scopes, options=options)
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/azure/identity/_credentials/chained.py", line 225, in get_token_info
+    raise ClientAuthenticationError(message=message)
+azure.core.exceptions.ClientAuthenticationError: DefaultAzureCredential failed to retrieve a token from the included credentials.
+Attempted credentials:
+	EnvironmentCredential: EnvironmentCredential authentication unavailable. Environment variables are not fully configured.
+Visit https://aka.ms/azsdk/python/identity/environmentcredential/troubleshoot to troubleshoot this issue.
+	WorkloadIdentityCredential: WorkloadIdentityCredential authentication unavailable. The workload options are not fully configured. See the troubleshooting guide for more information: https://aka.ms/azsdk/python/identity/workloadidentitycredential/troubleshoot. Missing required arguments: 'tenant_id', 'client_id', 'token_file_path'.
+	ManagedIdentityCredential: ManagedIdentityCredential authentication unavailable, no response from the IMDS endpoint.
+	SharedTokenCacheCredential: SharedTokenCacheCredential authentication unavailable. No accounts were found in the cache.
+	VisualStudioCodeCredential: VisualStudioCodeCredential requires the 'azure-identity-broker' package to be installed. You must also ensure you have the Azure Resources extension installed and have signed in to Azure via Visual Studio Code.
+	AzureCliCredential: Azure CLI not found on path
+	AzurePowerShellCredential: PowerShell is not installed
+	AzureDeveloperCliCredential: Azure Developer CLI could not be found. Please visit https://aka.ms/azure-dev for installation instructions and then,once installed, authenticate to your Azure account using 'azd auth login'.
+	BrokerCredential: InteractiveBrowserBrokerCredential unavailable. The 'azure-identity-broker' package is required to use brokered authentication.
+To mitigate this issue, please refer to the troubleshooting guidelines here at https://aka.ms/azsdk/python/identity/defaultazurecredential/troubleshoot.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/views.py", line 66, in analysis
+    result = workflow.run_analysis(
+        upload
+    )
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/workflow.py", line 14, in run_analysis
+    return self.analyzer.analyze_clothing(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        upload.original_image.path,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 100, in analyze_clothing
+    raise ClothingAnalysisError(str(exc)) from exc
+stylist.services.exceptions.ClothingAnalysisError: DefaultAzureCredential failed to retrieve a token from the included credentials.
+Attempted credentials:
+	EnvironmentCredential: EnvironmentCredential authentication unavailable. Environment variables are not fully configured.
+Visit https://aka.ms/azsdk/python/identity/environmentcredential/troubleshoot to troubleshoot this issue.
+	WorkloadIdentityCredential: WorkloadIdentityCredential authentication unavailable. The workload options are not fully configured. See the troubleshooting guide for more information: https://aka.ms/azsdk/python/identity/workloadidentitycredential/troubleshoot. Missing required arguments: 'tenant_id', 'client_id', 'token_file_path'.
+	ManagedIdentityCredential: ManagedIdentityCredential authentication unavailable, no response from the IMDS endpoint.
+	SharedTokenCacheCredential: SharedTokenCacheCredential authentication unavailable. No accounts were found in the cache.
+	VisualStudioCodeCredential: VisualStudioCodeCredential requires the 'azure-identity-broker' package to be installed. You must also ensure you have the Azure Resources extension installed and have signed in to Azure via Visual Studio Code.
+	AzureCliCredential: Azure CLI not found on path
+	AzurePowerShellCredential: PowerShell is not installed
+	AzureDeveloperCliCredential: Azure Developer CLI could not be found. Please visit https://aka.ms/azure-dev for installation instructions and then,once installed, authenticate to your Azure account using 'azd auth login'.
+	BrokerCredential: InteractiveBrowserBrokerCredential unavailable. The 'azure-identity-broker' package is required to use brokered authentication.
+To mitigate this issue, please refer to the troubleshooting guidelines here at https://aka.ms/azsdk/python/identity/defaultazurecredential/troubleshoot.
+
+--- ANALYSIS ERROR ---
+Traceback (most recent call last):
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 98, in analyze_clothing
+    text = self._generate_text(messages)
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 51, in _generate_text
+    response = self.client.chat.completions.create(
+        model=self.deployment_name,
+        messages=messages,
+        response_format={"type": "json_object"}
+    )
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_utils/_utils.py", line 298, in wrapper
+    return func(*args, **kwargs)
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/resources/chat/completions/completions.py", line 1251, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<52 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_base_client.py", line 1332, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_base_client.py", line 1105, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.NotFoundError: Error code: 404 - {'error': {'code': '404', 'message': 'Resource not found'}}
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/views.py", line 66, in analysis
+    result = workflow.run_analysis(
+        upload
+    )
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/workflow.py", line 14, in run_analysis
+    return self.analyzer.analyze_clothing(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        upload.original_image.path,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 101, in analyze_clothing
+    raise ClothingAnalysisError(str(exc)) from exc
+stylist.services.exceptions.ClothingAnalysisError: Error code: 404 - {'error': {'code': '404', 'message': 'Resource not found'}}
+
+--- ANALYSIS ERROR ---
+Traceback (most recent call last):
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 98, in analyze_clothing
+    text = self._generate_text(messages)
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 51, in _generate_text
+    response = self.client.chat.completions.create(
+        model=self.deployment_name,
+        messages=messages,
+        response_format={"type": "json_object"}
+    )
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_utils/_utils.py", line 298, in wrapper
+    return func(*args, **kwargs)
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/resources/chat/completions/completions.py", line 1251, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<52 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_base_client.py", line 1332, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_base_client.py", line 1105, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.NotFoundError: Error code: 404 - {'error': {'code': '404', 'message': 'Resource not found'}}
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/views.py", line 66, in analysis
+    result = workflow.run_analysis(
+        upload
+    )
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/workflow.py", line 14, in run_analysis
+    return self.analyzer.analyze_clothing(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        upload.original_image.path,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 101, in analyze_clothing
+    raise ClothingAnalysisError(str(exc)) from exc
+stylist.services.exceptions.ClothingAnalysisError: Error code: 404 - {'error': {'code': '404', 'message': 'Resource not found'}}
+
+--- ANALYSIS ERROR ---
+Traceback (most recent call last):
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 105, in analyze_clothing
+    text = self._generate_text(messages)
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 58, in _generate_text
+    response = self.client.chat.completions.create(
+        model=self.deployment_name,
+        messages=messages,
+        response_format={"type": "json_object"}
+    )
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_utils/_utils.py", line 298, in wrapper
+    return func(*args, **kwargs)
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/resources/chat/completions/completions.py", line 1251, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<52 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_base_client.py", line 1332, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_base_client.py", line 1105, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.NotFoundError: Error code: 404 - {'error': {'code': '404', 'message': 'Resource not found'}}
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/views.py", line 66, in analysis
+    result = workflow.run_analysis(
+        upload
+    )
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/workflow.py", line 14, in run_analysis
+    return self.analyzer.analyze_clothing(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        upload.original_image.path,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 108, in analyze_clothing
+    raise ClothingAnalysisError(str(exc)) from exc
+stylist.services.exceptions.ClothingAnalysisError: Error code: 404 - {'error': {'code': '404', 'message': 'Resource not found'}}
+
+--- ANALYSIS ERROR ---
+Traceback (most recent call last):
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 103, in analyze_clothing
+    text = self._generate_text(messages)
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 50, in _generate_text
+    response = self.client.responses.create(
+        model=self.deployment_name,
+        input=messages,
+    )
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/resources/responses/responses.py", line 954, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/responses",
+        ^^^^^^^^^^^^^
+    ...<46 lines>...
+        stream_cls=Stream[ResponseStreamEvent],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_base_client.py", line 1332, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_base_client.py", line 1105, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.NotFoundError: Error code: 404 - {'error': {'code': 'notFound', 'message': 'The specified entity cannot be found.'}}
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/views.py", line 66, in analysis
+    result = workflow.run_analysis(
+        upload
+    )
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/workflow.py", line 14, in run_analysis
+    return self.analyzer.analyze_clothing(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        upload.original_image.path,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 106, in analyze_clothing
+    raise ClothingAnalysisError(str(exc)) from exc
+stylist.services.exceptions.ClothingAnalysisError: Error code: 404 - {'error': {'code': 'notFound', 'message': 'The specified entity cannot be found.'}}
+
+--- ANALYSIS ERROR ---
+Traceback (most recent call last):
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 100, in analyze_clothing
+    text = self._generate_text(messages)
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 53, in _generate_text
+    response = self.client.chat.completions.create(
+        model=self.deployment_name,
+        messages=messages,
+        response_format={"type": "json_object"}
+    )
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_utils/_utils.py", line 298, in wrapper
+    return func(*args, **kwargs)
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/resources/chat/completions/completions.py", line 1251, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<52 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_base_client.py", line 1332, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_base_client.py", line 1105, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.NotFoundError: Error code: 404 - {'error': {'code': '404', 'message': 'Resource not found'}}
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/views.py", line 66, in analysis
+    result = workflow.run_analysis(
+        upload
+    )
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/workflow.py", line 14, in run_analysis
+    return self.analyzer.analyze_clothing(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        upload.original_image.path,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 103, in analyze_clothing
+    raise ClothingAnalysisError(str(exc)) from exc
+stylist.services.exceptions.ClothingAnalysisError: Error code: 404 - {'error': {'code': '404', 'message': 'Resource not found'}}
+
+--- ANALYSIS ERROR ---
+Traceback (most recent call last):
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 104, in analyze_clothing
+    text = self._generate_text(messages)
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 50, in _generate_text
+    response = self.client.responses.create(
+        model=self.deployment_name,
+        input=messages,
+    )
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/resources/responses/responses.py", line 954, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/responses",
+        ^^^^^^^^^^^^^
+    ...<46 lines>...
+        stream_cls=Stream[ResponseStreamEvent],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_base_client.py", line 1332, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_base_client.py", line 1105, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.NotFoundError: Error code: 404 - {'error': {'code': 'notFound', 'message': 'The specified entity cannot be found.'}}
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/views.py", line 66, in analysis
+    result = workflow.run_analysis(
+        upload
+    )
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/workflow.py", line 14, in run_analysis
+    return self.analyzer.analyze_clothing(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        upload.original_image.path,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 107, in analyze_clothing
+    raise ClothingAnalysisError(str(exc)) from exc
+stylist.services.exceptions.ClothingAnalysisError: Error code: 404 - {'error': {'code': 'notFound', 'message': 'The specified entity cannot be found.'}}
+
+--- ANALYSIS ERROR ---
+Traceback (most recent call last):
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 104, in analyze_clothing
+    text = self._generate_text(messages)
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 50, in _generate_text
+    response = self.client.responses.create(
+        model=self.deployment_name,
+        input=messages,
+    )
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/resources/responses/responses.py", line 954, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/responses",
+        ^^^^^^^^^^^^^
+    ...<46 lines>...
+        stream_cls=Stream[ResponseStreamEvent],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_base_client.py", line 1332, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/openai/_base_client.py", line 1105, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.NotFoundError: Error code: 404 - {'error': {'code': 'notFound', 'message': 'The specified entity cannot be found.'}}
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/views.py", line 66, in analysis
+    result = workflow.run_analysis(
+        upload
+    )
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/workflow.py", line 14, in run_analysis
+    return self.analyzer.analyze_clothing(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        upload.original_image.path,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/azure_openai.py", line 107, in analyze_clothing
+    raise ClothingAnalysisError(str(exc)) from exc
+stylist.services.exceptions.ClothingAnalysisError: Error code: 404 - {'error': {'code': 'notFound', 'message': 'The specified entity cannot be found.'}}
+
+--- ANALYSIS ERROR ---
+Traceback (most recent call last):
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/views.py", line 57, in analysis
+    workflow = WorkflowService()
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/workflow.py", line 11, in __init__
+    self.gemini = GeminiService()
+                  ~~~~~~~~~~~~~^^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/stylist/services/gemini.py", line 57, in __init__
+    self.client = genai.Client(
+                  ~~~~~~~~~~~~^
+        api_key=settings.GOOGLE_API_KEY,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/google/genai/client.py", line 219, in __init__
+    self._api_client = self._get_api_client(
+                       ~~~~~~~~~~~~~~~~~~~~^
+        vertexai=vertexai,
+        ^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+        http_options=http_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/google/genai/client.py", line 265, in _get_api_client
+    return BaseApiClient(
+        vertexai=vertexai,
+    ...<4 lines>...
+        http_options=http_options,
+    )
+  File "/home/gajjarkav/Desktop/fashoin-imagegeneration-django/.venv/lib/python3.14/site-packages/google/genai/_api_client.py", line 659, in __init__
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Missing key inputs argument! To use the Google AI API, provide (`api_key`) arguments. To use the Google Cloud API, provide (`vertexai`, `project` & `location`) arguments.

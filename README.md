@@ -529,5 +529,41 @@ For issues, questions, or suggestions:
 
 ---
 
+## 🔌 API Integrations
+
+### Image Editing API (Azure FLUX.2-pro)
+
+This project exposes an image editing REST API using Microsoft Azure AI Foundry's FLUX.2-pro model.
+
+#### Configuration
+Set the following variables in your `.env` file (these must remain server-side and should never be exposed to the client):
+```ini
+AZURE_FLUX_ENDPOINT=https://<resource-name>.api.cognitive.microsoft.com
+AZURE_FLUX_API_KEY=your-secret-azure-key
+AZURE_FLUX_MODEL=FLUX.2-pro
+AZURE_FLUX_API_VERSION=preview
+```
+
+#### Run the Endpoint
+The endpoint handles `multipart/form-data` at `POST /api/v1/images/edit`.
+
+#### Example cURL
+```bash
+curl -X POST "http://localhost:8000/api/v1/images/edit" \
+  -F "image=@reference.jpg" \
+  -F 'prompt=Change the shirt to a premium black formal jacket while keeping the face, pose and background unchanged.'
+```
+
+#### Expected Response
+```json
+{
+  "success": true,
+  "image_url": "http://localhost:8000/media/generated/flux_<uuid>.jpeg",
+  "model": "FLUX.2-pro"
+}
+```
+
+---
+
 **Last Updated**: July 2026
 **Version**: 1.0.0

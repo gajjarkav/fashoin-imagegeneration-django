@@ -1,30 +1,24 @@
 """
 Prompt templates for outfit image generation / editing.
 
-WHY THIS FILE WAS REWRITTEN
----------------------------
-The old IMAGE_SYSTEM_PROMPT told the image model:
+There are two prompt builders:
 
-    "The uploaded clothing item MUST remain unchanged.
-     Never modify: color, logo, print, graphics, text, fabric, texture.
-     The clothing item must be exactly the same as the uploaded image."
+  build_outfit_edit_prompt  -- for Gemini instruction-following editors.
+  build_flux_prompt         -- for Azure FLUX.2-pro (descriptive caption only).
 
-Instruction-following editors (Gemini "Nano Banana" gemini-2.5-flash-image,
-FLUX Kontext / FLUX 2 Pro img2img, Pruna p-image-edit ...) take that
-literally: the safest edit that satisfies "change nothing" is to return the
-input photo untouched (at most swapping the background). That is exactly the
-behaviour reported in the bug: every "generated" image looks like the input.
+Why two styles?
+---------------
+Gemini's image editor understands step-by-step edit instructions.
+FLUX.2-pro is a diffusion model; it generates images from descriptive
+captions. Sending instruction-style text ("Edit this photo and follow EVERY
+step", "Do NOT crop", "Negative:") to FLUX also triggers Azure's RAI
+content-safety filter (BingBlockList_Prompt) because the framing resembles
+prompt-injection / jailbreak patterns.
 
-On top of that the styling plan was injected as raw JSON. Diffusion models
-(SD3 img2img) do not understand JSON or instructions - they rendered the
-listed items ("white sneakers", ...) as floating props in the background
-instead of putting them on the person (also visible in the bug screenshots).
-
-The prompts below are written as explicit EDIT INSTRUCTIONS:
-  * keep identity + the hero garment,
-  * but re-frame to full body,
-  * MAKE THE PERSON WEAR every new item,
-  * and replace the background.
+The FLUX prompt must be:
+  * A positive, descriptive caption of the TARGET image.
+  * No imperative commands, no negations, no numbered steps.
+  * Short enough to stay within Azure's token budget.
 """
 
 
@@ -111,3 +105,39 @@ def build_outfit_caption(styling_plan: dict) -> str:
         "correct anatomy, sharp focus, high detail"
     )
     return caption
+
+
+def build_flux_prompt(styling_plan: dict) -> str:
+    """
+    Ultra-minimal fashion-only caption for Azure FLUX.2-pro.
+
+    Rules:
+    - NO person/identity references ("same person", "reference image",
+      "person's face") — these trigger Azure's BingBlockList identity filter.
+    - NO imperative commands — triggers jailbreak filter.
+    - ONLY describe the clothing and scene in positive fashion-editorial terms.
+    """
+    plan = styling_plan or {}
+
+    bottom      = _as_text(plan.get("bottom"))      or "casual trousers"
+    footwear    = _as_text(plan.get("footwear"))    or "sneakers"
+    accessories = _as_text(plan.get("accessories"))
+    bag         = _as_text(plan.get("bag"))
+    jewelry     = _as_text(plan.get("jewelry"))
+    theme       = _as_text(plan.get("theme"))       or "casual"
+
+    items = [bottom, footwear]
+    if accessories:
+        items.append(accessories)
+    if bag:
+        items.append(bag)
+    if jewelry:
+        items.append(jewelry)
+    items_str = ", ".join(i for i in items if i)
+
+    return (
+        f"Fashion editorial photo, "
+        f"full body outfit: {items_str}, "
+        f"{theme} style, "
+        f"photorealistic, studio lighting, sharp focus."
+    )
